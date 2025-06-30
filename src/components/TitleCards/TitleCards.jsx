@@ -1,9 +1,11 @@
 import React,{useRef,useEffect, useState} from 'react'
 import './TitleCards.css'
 import cards_data from '../../assets/cards/Cards_data'
+import { Link } from 'react-router-dom'
 const TitleCards = ({title,category}) => {
   const [apiData,setApiData] = useState([])
   const cardsRef = useRef()
+  let setCategory = category ? category : 'now_playing'
   // tmdb fetch options code from api documentation
 
   const options = {
@@ -20,22 +22,23 @@ const TitleCards = ({title,category}) => {
 
   }
   useEffect(()=>{
-    fetch('https://api.themoviedb.org/3/movie/popular?language=en-US&page=1', options)
+    fetch(`https://api.themoviedb.org/3/movie/${setCategory}?language=en-US&page=1`, options)
   .then(res => res.json())
   .then(res => setApiData(res.results))
   .catch(err => console.error(err));
 
     cardsRef.current.addEventListener('wheel',handleWheel)
   },[])
+  console.log('api data array:',apiData)
   return (
     <div className='title-cards'>
       <h2>{title?title:"Popular on Netflix"}</h2>
       <div className="card-list " ref={cardsRef}>
         {apiData.map((card,index)=>{
-          return <div className="card" key={index}>
-              <img src={`https://image.tmdb.org/t/p/w500/${card.backdrop_path}.jpg`} alt={`${card.original_title} poster`} />
+          return <Link to={`/player/${card.id}`} className="card" key={index}>
+              <img src={`https://image.tmdb.org/t/p/w500${card.backdrop_path}`} alt={`${card.original_title} poster`} />
               <p>{card.original_title}</p>
-          </div>
+          </Link>
         })}
       </div>
     </div>
